@@ -3,6 +3,7 @@ const express = require('express');
 const app = express()
 const { MongoClient, ServerApiVersion } = require('mongodb');
 require('dotenv').config()
+const { query } = require('express');
 const port = process.env.PORT || 5000;
 
 // middlewere
@@ -17,14 +18,25 @@ app.get('/', (req, res) => {
 
 
 
-const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.jle6tre.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://${process.env.DB_USERNAME}:${process.env.DB_PASS}@cluster0.jle6tre.mongodb.net/?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, serverApi: ServerApiVersion.v1 });
 async function run() {
     try {
         const uploadCollection = client.db('notebook').collection('upload')
 
         // posting data to database
+        app.post('/upload', async (req, res) => {
+            const query = req.body
+            const result = await uploadCollection.insertOne(query)
+            res.send(result)
+        })
 
+        // get uplodet data from database 
+        app.get('/uploaded', async (req, res) => {
+            const query = {}
+            const result = await uploadCollection.find(query).toArray()
+            res.send(result)
+        })
 
     }
     finally {
