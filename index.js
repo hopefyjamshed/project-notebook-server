@@ -26,6 +26,8 @@ async function run() {
         const commentCollection = client.db('notebook').collection('comment')
         const profileCollection = client.db('notebook').collection('profile')
 
+        const likesCollection = client.db('notebook').collection('likes')
+
 
         // posting data to database
         app.post('/upload', async (req, res) => {
@@ -70,9 +72,16 @@ async function run() {
             res.send(result)
         })
 
-        app.post('/comment/', async (req, res) => {
+        app.post('/comment', async (req, res) => {
             const query = req.body
             const result = await commentCollection.insertOne(query)
+            res.send(result)
+        })
+
+        // posting comment 
+        app.post('/like', async (req, res) => {
+            const query = req.body
+            const result = await likesCollection.insertOne(query)
             res.send(result)
         })
 
@@ -97,6 +106,28 @@ async function run() {
             const result = await commentCollection.find(filter).sort({ '_id': -1 }).toArray()
             res.send(result)
         })
+
+        // getting like by id 
+
+        // app.get('/like/:id', async (req, res) => {
+        //     const id = req.params.id
+        //     const filter = { id: id }
+        //     const result = await likesCollection.find(filter).sort({ '_id': -1 }).toArray()
+        //     res.send(result)
+
+        app.get('/likes/:number', async (req, res) => {
+            const id = req.params.number
+            const filter = { number: id }
+            const result = await likesCollection.find(filter).toArray()
+            res.send(result)
+        })
+
+        app.get('/likes', async (req, res) => {
+            const query = {}
+            const result = await likesCollection.find(query).toArray()
+            res.send(result)
+        })
+
 
 
     }
