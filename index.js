@@ -34,6 +34,25 @@ async function run() {
             res.send(result)
         })
 
+        // put a comment in database 
+        app.post('/uploaded/:id', async (req, res) => {
+            const id = req.params.id
+            const comment = req.body
+            const filter = { _id: ObjectId(id) }
+            const options = { Upsert: true }
+            const updatedDoc = {
+                $set:
+                    [
+                        {
+                            comment: comment
+                        }
+                    ]
+
+            }
+            const result = await uploadCollection.insertOne(updatedDoc)
+            res.send(result)
+        })
+        // filter, updatedDoc, options
         // profile data 
 
         app.post('/profile', async (req, res) => {
@@ -51,7 +70,7 @@ async function run() {
             res.send(result)
         })
 
-        app.post('/comment', async (req, res) => {
+        app.post('/comment/', async (req, res) => {
             const query = req.body
             const result = await commentCollection.insertOne(query)
             res.send(result)
@@ -72,9 +91,10 @@ async function run() {
             res.send(result)
         })
         // getting comment 
-        app.get('/comment', async (req, res) => {
-            const query = {}
-            const result = await commentCollection.find(query).toArray()
+        app.get('/comment/:id', async (req, res) => {
+            const id = req.params.id
+            const filter = { id: id }
+            const result = await commentCollection.find(filter).sort({ '_id': -1 }).toArray()
             res.send(result)
         })
 
